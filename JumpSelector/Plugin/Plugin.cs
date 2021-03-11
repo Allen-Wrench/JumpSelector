@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HarmonyLib;
+using System;
 using Sandbox;
 using VRage.Plugins;
 
@@ -11,8 +12,9 @@ namespace JumpSelector.Plugin
 		}
 
 		public void Init(object gameInstance)
-		{
-			MySandboxGame.Log.WriteLine("Jump Selector Plugin Loaded.");
+        {
+            new Harmony("JumpSelector").Patch(AccessTools.Method("Sandbox.Game.Entities.MyJumpDrive:CreateTerminalControls", null, null), null, null, new HarmonyMethod(AccessTools.Method("JumpSelector.Plugin.JumpSelectorPatch:JumpSelectTranspiler", null, null)), null);
+            MySandboxGame.Log.WriteLine("Jump Selector Plugin Loaded.");
 		}
 
 		public void Update()
