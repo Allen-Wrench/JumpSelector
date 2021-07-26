@@ -10,6 +10,7 @@ using Sandbox.Game.Screens.Terminal.Controls;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using VRage.Game;
+using VRageMath;
 
 namespace JumpSelector.Plugin
 {
@@ -31,6 +32,7 @@ namespace JumpSelector.Plugin
             myTerminalAction.InvalidToolbarTypes = new List<MyToolbarType>
             {
                 MyToolbarType.Character,
+                MyToolbarType.ButtonPanel,
                 MyToolbarType.Seat
             };
             MyTerminalControlFactory.AddAction<MyJumpDrive>(myTerminalAction);
@@ -38,10 +40,14 @@ namespace JumpSelector.Plugin
 
         public static void ShowJumpSelector(MyJumpDrive block)
         {
-            MyRelationsBetweenPlayerAndBlock userRelationToOwner = block.GetUserRelationToOwner(MySession.Static.LocalPlayerId);
-            if (userRelationToOwner == MyRelationsBetweenPlayerAndBlock.FactionShare || userRelationToOwner == MyRelationsBetweenPlayerAndBlock.Owner)
+            if (block.IDModule.ShareMode == MyOwnershipShareModeEnum.All || (block.GetPlayerRelationToOwner() == MyRelationsBetweenPlayerAndBlock.Owner || block.GetPlayerRelationToOwner() == MyRelationsBetweenPlayerAndBlock.FactionShare))
             {
-                MyGuiSandbox.AddScreen(new JumpSelectorGui());
+                MyGuiSandbox.AddScreen(new JumpSelectorGui(block));
+            }
+            else
+            {
+                MyGuiSandbox.Show(new StringBuilder("You do not have permission to use this block"), VRage.Utils.MyStringId.GetOrCompute("Invalid Permissions"));
+                return;
             }
         }
 

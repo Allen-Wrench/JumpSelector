@@ -28,29 +28,34 @@ namespace JumpSelector.Plugin
             Vector2 value = JumpSelectorGui.listpos;
             float num = JumpSelectorGui.listoffset;
             Vector2 vector = JumpSelectorGui.listsize;
-            vector.X -= (float)(this.JumpDrives.Count - 1) * num;
-            vector.X /= (float)this.JumpDrives.Count;
-            for (int i = 0; i < this.JumpDrives.Count; i++)
+            try
             {
-                MyTuple<string, Color> tooltip = this.GetTooltip(this.JumpDrives[i]);
-                string item = tooltip.Item1;
-                Color item2 = tooltip.Item2;
-                MyGuiControlButton myGuiControlButton = new MyGuiControlButton(new Vector2?(value), MyGuiControlButtonStyleEnum.Rectangular, new Vector2?(vector), null, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, item, null, 0.8f, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, MyGuiControlHighlightType.WHEN_CURSOR_OVER, null, GuiSounds.MouseClick, 1f, new int?(i), false, false, false, null);
-                myGuiControlButton.DrawCrossTextureWhenDisabled = true;
-                myGuiControlButton.Enabled = this.JumpDrives[i].IsBuilt;
-                myGuiControlButton.ShowTooltipWhenDisabled = true;
-                myGuiControlButton.BorderColor = item2;
-                myGuiControlButton.BorderEnabled = true;
-                myGuiControlButton.BorderSize = 2;
-                myGuiControlButton.TooltipDelay = 0;
-                this.Controls.Add(myGuiControlButton);
-                myGuiControlButton.ButtonClicked += this.ToggleJDPower;
-                this.buttonlist.Add(myGuiControlButton);
-                value.X += vector.X + num;
+                vector.X -= (float)(this.JumpDrives.Count - 1) * num;
+                vector.X /= (float)this.JumpDrives.Count;
+                for (int i = 0; i < this.JumpDrives.Count; i++)
+                {
+                    MyTuple<string, Color> tooltip = this.GetTooltip(this.JumpDrives[i]);
+                    string item = tooltip.Item1;
+                    Color item2 = tooltip.Item2;
+                    MyGuiControlButton myGuiControlButton = new MyGuiControlButton(new Vector2?(value), MyGuiControlButtonStyleEnum.Rectangular, new Vector2?(vector), null, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, item, null, 0.8f, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, MyGuiControlHighlightType.WHEN_CURSOR_OVER, null, GuiSounds.MouseClick, 1f, new int?(i), false, false, false, null);
+                    myGuiControlButton.DrawCrossTextureWhenDisabled = true;
+                    myGuiControlButton.Enabled = this.JumpDrives[i].IsBuilt;
+                    myGuiControlButton.ShowTooltipWhenDisabled = true;
+                    myGuiControlButton.BorderColor = item2;
+                    myGuiControlButton.BorderEnabled = true;
+                    myGuiControlButton.BorderSize = 2;
+                    myGuiControlButton.TooltipDelay = 0;
+                    this.Controls.Add(myGuiControlButton);
+                    myGuiControlButton.ButtonClicked += this.ToggleJDPower;
+                    myGuiControlButton.SecondaryButtonClicked += this.ToggleAllJDPower;
+                    this.buttonlist.Add(myGuiControlButton);
+                    value.X += vector.X + num;
+                }
             }
+            catch { }
             this.listlabel = new MyGuiControlLabel(new Vector2?(JumpSelectorGui.labelpos), new Vector2?(JumpSelectorGui.labelsize), "Power Toggles", null, 0.7f, "Blue", MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, false, float.PositiveInfinity, false);
             this.Controls.Add(this.listlabel);
-            this.rangelabel = new MyGuiControlLabel(new Vector2?(JumpSelectorGui.rangepos), new Vector2?(JumpSelectorGui.rangesize), string.Format("Max Range: {0:N0}km", this.JumpSystem.GetMaxJumpDistance(this.ControlledBy.OwnerId) / 1000.0), null, 0.7f, "Blue", MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, false, float.PositiveInfinity, false);
+            this.rangelabel = new MyGuiControlLabel(new Vector2?(JumpSelectorGui.rangepos), new Vector2?(JumpSelectorGui.rangesize), string.Format("Max Range: {0:N0}km", this.JumpSystem.GetMaxJumpDistance(MySession.Static.LocalPlayerId) / 1000.0), null, 0.7f, "Blue", MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, false, float.PositiveInfinity, false);
             this.Controls.Add(this.rangelabel);
             this.radioButtonGPS = new MyGuiControlRadioButton
             {
@@ -144,23 +149,20 @@ namespace JumpSelector.Plugin
             this.CloseScreen(false);
         }
 
-        public JumpSelectorGui() : base(new Vector2?(new Vector2(0.5f, 0.5f)), new Vector4?(MyGuiConstants.SCREEN_BACKGROUND_COLOR * MySandboxGame.Config.UIBkOpacity), new Vector2?(new Vector2(0.55f, 0.4f)), false, null, 0f, 0f, null)
+        public JumpSelectorGui(MyJumpDrive block) : base(new Vector2?(new Vector2(0.5f, 0.5f)), new Vector4?(MyGuiConstants.SCREEN_BACKGROUND_COLOR * MySandboxGame.Config.UIBkOpacity), new Vector2?(new Vector2(0.55f, 0.4f)), false, null, 0f, 0f, null)
         {
             this.gpsList = new SortedList<string, IMyGps>();
             base.CanHideOthers = false;
             base.EnabledBackgroundFade = false;
             base.CloseButtonEnabled = true;
+            JumpDrive = block;
             MyPlayer localHumanPlayer = MySession.Static.LocalHumanPlayer;
-            if (localHumanPlayer != null && localHumanPlayer.Controller != null && localHumanPlayer.Controller.ControlledEntity != null && localHumanPlayer.Controller.ControlledEntity.Entity is MyCubeBlock)
+            if (localHumanPlayer != null && localHumanPlayer.Controller != null && localHumanPlayer.Controller.ControlledEntity != null && localHumanPlayer.Controller.ControlledEntity is MyShipController && JumpDrive != null)
             {
-                this.ControlledBy = (MyCubeBlock)localHumanPlayer.Controller.ControlledEntity.Entity;
-                if (!(this.ControlledBy is MyCockpit) && !(this.ControlledBy is MyRemoteControl))
-                {
-                    return;
-                }
-                this.JumpSystem = this.ControlledBy.CubeGrid.GridSystems.JumpSystem;
+                this.Controller = localHumanPlayer.Controller.ControlledEntity as MyShipController;
+                this.JumpSystem = block.CubeGrid.GridSystems.JumpSystem;
             }
-            foreach (MyJumpDrive myJumpDrive in this.ControlledBy.CubeGrid.GetFatBlocks<MyJumpDrive>())
+            foreach (MyJumpDrive myJumpDrive in JumpDrive.CubeGrid.GetFatBlocks<MyJumpDrive>())
             {
                 this.JumpDrives.Add(myJumpDrive);
                 if (!myJumpDrive.IsFull)
@@ -199,7 +201,7 @@ namespace JumpSelector.Plugin
             }
             JumpSelectorGui.lastSelectedGps = (int)this.gpsCombobox.GetSelectedKey();
             IMyGps myGps = this.gpsList.Values[JumpSelectorGui.lastSelectedGps];
-            this.JumpSystem.RequestJump(myGps.Name, myGps.Coords, this.ControlledBy.OwnerId);
+            this.JumpSystem.RequestJump(myGps.Name, myGps.Coords, MySession.Static.LocalPlayerId);
         }
 
         private void BlindJump(MyGuiControlTextbox obj)
@@ -221,20 +223,26 @@ namespace JumpSelector.Plugin
             {
                 num = 5000.01;
             }
-            Vector3D value = Vector3D.Transform(Base6Directions.GetVector(this.ControlledBy.Orientation.Forward), this.ControlledBy.CubeGrid.WorldMatrix.GetOrientation());
+            Vector3D value = Vector3D.Transform(Base6Directions.GetVector(this.Controller.Orientation.Forward), this.Controller.CubeGrid.WorldMatrix.GetOrientation());
             value.Normalize();
-            Vector3D destination = this.ControlledBy.CubeGrid.WorldMatrix.Translation + value * num;
-            this.JumpSystem.RequestJump("Blind Jump", destination, this.ControlledBy.OwnerId);
-        }
-
-        static JumpSelectorGui()
-        {
+            Vector3D destination = this.JumpDrive.CubeGrid.WorldMatrix.Translation + value * num;
+            this.JumpSystem.RequestJump("Blind Jump", destination, MySession.Static.LocalPlayerId);
         }
 
         private void ToggleJDPower(MyGuiControlButton obj)
         {
             this.JumpDrives[obj.Index].Enabled = !this.JumpDrives[obj.Index].Enabled;
             this.RefreshButton(obj);
+        }
+
+        private void ToggleAllJDPower(MyGuiControlButton obj)
+        {
+            foreach (var drive in this.JumpDrives)
+            {
+                if  (drive != null)
+                    drive.Enabled = true;
+            }
+            this.RecreateControls(false);
         }
 
         private void RefreshButton(MyGuiControlButton obj)
@@ -244,7 +252,7 @@ namespace JumpSelector.Plugin
                 MyTuple<string, Color> tooltip = this.GetTooltip(this.JumpDrives[obj.Index]);
                 obj.BorderColor = tooltip.Item2;
                 obj.SetToolTip(tooltip.Item1);
-                this.rangelabel.Text = string.Format("Max Range: {0:N0}km", this.JumpSystem.GetMaxJumpDistance(this.ControlledBy.OwnerId) / 1000.0);
+                this.rangelabel.Text = string.Format("Max Range: {0:N0}km", this.JumpSystem.GetMaxJumpDistance(MySession.Static.LocalPlayerId) / 1000.0);
                 return;
             }
             obj.BorderColor = Color.Gray;
@@ -271,7 +279,6 @@ namespace JumpSelector.Plugin
 
         private MyTuple<string, Color> GetTooltip(MyJumpDrive jd)
         {
-            bool enabled = jd.Enabled;
             string text = "[On] ";
             Color item = Color.Green;
             if (!jd.IsFull)
@@ -280,7 +287,7 @@ namespace JumpSelector.Plugin
                 text = string.Format("[Charging {0:N1}%] ", num);
                 item = Color.Yellow;
             }
-            if (!enabled)
+            if (!jd.Enabled)
             {
                 text = "[Off] ";
                 item = Color.Red;
@@ -301,10 +308,7 @@ namespace JumpSelector.Plugin
             obj.GetText(stringBuilder);
             string text = stringBuilder.ToString();
             SortedList<string, IMyGps> sortedList = new SortedList<string, IMyGps>();
-            string[] array = text.ToLower().Split(new char[]
-            {
-                ' '
-            });
+            string[] array = text.ToLower().Split(new char[]{' '});
             if (text != null)
             {
                 using (IEnumerator<KeyValuePair<string, IMyGps>> enumerator = this.gpsList.GetEnumerator())
@@ -411,7 +415,9 @@ namespace JumpSelector.Plugin
 
         private MyGridJumpDriveSystem JumpSystem;
 
-        private MyCubeBlock ControlledBy;
+        private MyJumpDrive JumpDrive;
+
+        private MyShipController Controller;
 
         private List<MyJumpDrive> JumpDrives = new List<MyJumpDrive>();
 
