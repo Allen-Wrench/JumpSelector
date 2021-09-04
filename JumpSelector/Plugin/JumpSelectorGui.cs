@@ -180,16 +180,15 @@ namespace JumpSelector.Plugin
             foreach (IMyGps myGps in list)
             {
                 string text = myGps.Name;
-                if (this.gpsList.ContainsKey(text))
+                if (!gpsList.ContainsKey(text))
                 {
-                    text += " - ";
-                    text += list.IndexOf(myGps).ToString();
+                    gpsList.Add(text, myGps);
                 }
-                this.gpsList.Add(text, myGps);
             }
-            foreach (KeyValuePair<string, IMyGps> keyValuePair in this.gpsList)
+            gpsCombobox.ClearItems();
+            foreach (KeyValuePair<string, IMyGps> keyValuePair in gpsList)
             {
-                this.gpsCombobox.AddItem((long)this.gpsList.IndexOfKey(keyValuePair.Key), keyValuePair.Key, null, null, true);
+                gpsCombobox.AddItem((long)gpsList.IndexOfKey(keyValuePair.Key), keyValuePair.Key, null, null, true);
             }
         }
 
