@@ -24,43 +24,43 @@ namespace JumpSelector.Plugin
 
         public override void RecreateControls(bool contructor)
         {
-            base.RecreateControls(contructor);
-            Vector2 value = JumpSelectorGui.listpos;
-            float num = JumpSelectorGui.listoffset;
-            Vector2 vector = JumpSelectorGui.listsize;
+            RecreateControls(contructor);
+            Vector2 value = listpos;
+            float num = listoffset;
+            Vector2 vector = listsize;
             try
             {
-                vector.X -= (float)(this.JumpDrives.Count - 1) * num;
-                vector.X /= (float)this.JumpDrives.Count;
-                for (int i = 0; i < this.JumpDrives.Count; i++)
+                vector.X -= (float)(JumpDrives.Count - 1) * num;
+                vector.X /= (float)JumpDrives.Count;
+                for (int i = 0; i < JumpDrives.Count; i++)
                 {
-                    MyTuple<string, Color> tooltip = this.GetTooltip(this.JumpDrives[i]);
+                    MyTuple<string, Color> tooltip = GetTooltip(JumpDrives[i]);
                     string item = tooltip.Item1;
                     Color item2 = tooltip.Item2;
                     MyGuiControlButton myGuiControlButton = new MyGuiControlButton(new Vector2?(value), MyGuiControlButtonStyleEnum.Rectangular, new Vector2?(vector), null, MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, item, null, 0.8f, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, MyGuiControlHighlightType.WHEN_CURSOR_OVER, null, GuiSounds.MouseClick, 1f, new int?(i), false, false, false, null);
                     myGuiControlButton.DrawCrossTextureWhenDisabled = true;
-                    myGuiControlButton.Enabled = this.JumpDrives[i].IsBuilt;
+                    myGuiControlButton.Enabled = JumpDrives[i].IsBuilt;
                     myGuiControlButton.ShowTooltipWhenDisabled = true;
                     myGuiControlButton.BorderColor = item2;
                     myGuiControlButton.BorderEnabled = true;
                     myGuiControlButton.BorderSize = 2;
                     myGuiControlButton.TooltipDelay = 0;
-                    this.Controls.Add(myGuiControlButton);
-                    myGuiControlButton.ButtonClicked += this.ToggleJDPower;
-                    myGuiControlButton.SecondaryButtonClicked += this.ToggleAllJDPower;
-                    this.buttonlist.Add(myGuiControlButton);
+                    Controls.Add(myGuiControlButton);
+                    myGuiControlButton.ButtonClicked += ToggleJDPower;
+                    myGuiControlButton.SecondaryButtonClicked += ToggleAllJDPower;
+                    buttonlist.Add(myGuiControlButton);
                     value.X += vector.X + num;
                 }
             }
             catch { }
-            this.listlabel = new MyGuiControlLabel(new Vector2?(JumpSelectorGui.labelpos), new Vector2?(JumpSelectorGui.labelsize), "Power Toggles", null, 0.7f, "Blue", MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, false, float.PositiveInfinity, false);
-            this.Controls.Add(this.listlabel);
-            this.rangelabel = new MyGuiControlLabel(new Vector2?(JumpSelectorGui.rangepos), new Vector2?(JumpSelectorGui.rangesize), string.Format("Max Range: {0:N0}km", this.JumpSystem.GetMaxJumpDistance(MySession.Static.LocalPlayerId) / 1000.0), null, 0.7f, "Blue", MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, false, float.PositiveInfinity, false);
-            this.Controls.Add(this.rangelabel);
-            this.radioButtonGPS = new MyGuiControlRadioButton
+            listlabel = new MyGuiControlLabel(new Vector2?(labelpos), new Vector2?(labelsize), "Power Toggles", null, 0.7f, "Blue", MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, false, float.PositiveInfinity, false);
+            Controls.Add(listlabel);
+            rangelabel = new MyGuiControlLabel(new Vector2?(rangepos), new Vector2?(rangesize), string.Format("Max Range: {0:N0}km", JumpSystem.GetMaxJumpDistance(MySession.Static.LocalPlayerId) / 1000.0), null, 0.7f, "Blue", MyGuiDrawAlignEnum.HORISONTAL_LEFT_AND_VERTICAL_CENTER, false, float.PositiveInfinity, false);
+            Controls.Add(rangelabel);
+            radioButtonGPS = new MyGuiControlRadioButton
             {
-                Position = JumpSelectorGui.gpspos,
-                Size = JumpSelectorGui.radiosize,
+                Position = gpspos,
+                Size = radiosize,
                 Name = "radioGPS",
                 OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER,
                 Key = 0,
@@ -68,10 +68,10 @@ namespace JumpSelector.Plugin
                 CanHaveFocus = false,
                 Text = new StringBuilder("Jump to GPS")
             };
-            this.radioButtonBlind = new MyGuiControlRadioButton
+            radioButtonBlind = new MyGuiControlRadioButton
             {
-                Position = JumpSelectorGui.blindpos,
-                Size = JumpSelectorGui.radiosize,
+                Position = blindpos,
+                Size = radiosize,
                 Name = "radioBlind",
                 OriginAlign = MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER,
                 Key = 1,
@@ -79,98 +79,98 @@ namespace JumpSelector.Plugin
                 CanHaveFocus = false,
                 Text = new StringBuilder("Blind Jump")
             };
-            this.radioButtonGroup = new MyGuiControlRadioButtonGroup();
-            this.radioButtonGroup.Add(this.radioButtonGPS);
-            this.radioButtonGroup.Add(this.radioButtonBlind);
-            this.distanceTextbox = new MyGuiControlTextbox(new Vector2?(JumpSelectorGui.textpos), JumpSelectorGui.lastDistance, 10, null, 0.8f, MyGuiControlTextboxType.DigitsOnly, MyGuiControlTextboxStyleEnum.Default, false);
-            this.distanceTextbox.Size = JumpSelectorGui.textsize;
-            Vector2 value2 = new Vector2(JumpSelectorGui.combopos.X, JumpSelectorGui.combopos.Y - JumpSelectorGui.textsize.Y - 0.01f);
-            this.searchTextbox = new MyGuiControlTextbox(new Vector2?(value2), null, 20, null, 0.8f, MyGuiControlTextboxType.Normal, MyGuiControlTextboxStyleEnum.Default, false);
-            this.searchTextbox.Size = JumpSelectorGui.textsize;
-            this.searchTextbox.SetToolTip("Search GPS Entries");
-            this.gpsCombobox = new MyGuiControlCombobox(new Vector2?(JumpSelectorGui.combopos), new Vector2?(JumpSelectorGui.combosize), null, null, 10, null, false, null, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, null, false, false);
-            this.confirmButton = new MyGuiControlButton(new Vector2?(JumpSelectorGui.confirmpos), MyGuiControlButtonStyleEnum.Default, new Vector2?(JumpSelectorGui.confirmsize), null, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, null, new StringBuilder("Confirm"), 0.8f, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, MyGuiControlHighlightType.WHEN_CURSOR_OVER, null, GuiSounds.MouseClick, 1f, null, false, false, false, null);
-            this.cancelButton = new MyGuiControlButton(new Vector2?(JumpSelectorGui.cancelpos), MyGuiControlButtonStyleEnum.Default, new Vector2?(JumpSelectorGui.cancelsize), null, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, null, new StringBuilder("Cancel"), 0.8f, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, MyGuiControlHighlightType.WHEN_CURSOR_OVER, null, GuiSounds.MouseClick, 1f, null, false, false, false, null);
-            this.GetGPSList();
-            this.Controls.Add(this.radioButtonGPS);
-            this.Controls.Add(this.radioButtonBlind);
-            this.Controls.Add(this.distanceTextbox);
-            this.Controls.Add(this.searchTextbox);
-            this.Controls.Add(this.gpsCombobox);
-            this.Controls.Add(this.confirmButton);
-            this.Controls.Add(this.cancelButton);
-            base.FocusedControl = this.distanceTextbox;
-            this.gpsCombobox.SelectItemByIndex(JumpSelectorGui.lastSelectedGps);
-            this.radioButtonGroup.SelectByKey(1);
-            this.distanceTextbox.SelectAll();
-            this.confirmButton.ButtonClicked += this.confirmButton_OnButtonClick;
-            this.cancelButton.ButtonClicked += this.cancelButton_OnButtonClick;
-            this.distanceTextbox.FocusChanged += this.SelectBlindOption;
-            this.distanceTextbox.TextChanged += this.DistanceTextChanged;
-            this.distanceTextbox.EnterPressed += this.BlindJump;
-            this.gpsCombobox.FocusChanged += this.SelectGPSOption;
-            this.searchTextbox.TextChanged += this.FilterGpsList;
-            this.searchTextbox.FocusChanged += this.SearchFocusChanged;
+            radioButtonGroup = new MyGuiControlRadioButtonGroup();
+            radioButtonGroup.Add(radioButtonGPS);
+            radioButtonGroup.Add(radioButtonBlind);
+            distanceTextbox = new MyGuiControlTextbox(new Vector2?(textpos), lastDistance, 10, null, 0.8f, MyGuiControlTextboxType.DigitsOnly, MyGuiControlTextboxStyleEnum.Default, false);
+            distanceTextbox.Size = textsize;
+            Vector2 value2 = new Vector2(combopos.X, combopos.Y - textsize.Y - 0.01f);
+            searchTextbox = new MyGuiControlTextbox(new Vector2?(value2), null, 20, null, 0.8f, MyGuiControlTextboxType.Normal, MyGuiControlTextboxStyleEnum.Default, false);
+            searchTextbox.Size = textsize;
+            searchTextbox.SetToolTip("Search GPS Entries");
+            gpsCombobox = new MyGuiControlCombobox(new Vector2?(combopos), new Vector2?(combosize), null, null, 10, null, false, null, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, null, false, false);
+            confirmButton = new MyGuiControlButton(new Vector2?(confirmpos), MyGuiControlButtonStyleEnum.Default, new Vector2?(confirmsize), null, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, null, new StringBuilder("Confirm"), 0.8f, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, MyGuiControlHighlightType.WHEN_CURSOR_OVER, null, GuiSounds.MouseClick, 1f, null, false, false, false, null);
+            cancelButton = new MyGuiControlButton(new Vector2?(cancelpos), MyGuiControlButtonStyleEnum.Default, new Vector2?(cancelsize), null, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, null, new StringBuilder("Cancel"), 0.8f, MyGuiDrawAlignEnum.HORISONTAL_CENTER_AND_VERTICAL_CENTER, MyGuiControlHighlightType.WHEN_CURSOR_OVER, null, GuiSounds.MouseClick, 1f, null, false, false, false, null);
+            GetGPSList();
+            Controls.Add(radioButtonGPS);
+            Controls.Add(radioButtonBlind);
+            Controls.Add(distanceTextbox);
+            Controls.Add(searchTextbox);
+            Controls.Add(gpsCombobox);
+            Controls.Add(confirmButton);
+            Controls.Add(cancelButton);
+            FocusedControl = distanceTextbox;
+            gpsCombobox.SelectItemByIndex(lastSelectedGps);
+            radioButtonGroup.SelectByKey(1);
+            distanceTextbox.SelectAll();
+            confirmButton.ButtonClicked += confirmButton_OnButtonClick;
+            cancelButton.ButtonClicked += cancelButton_OnButtonClick;
+            distanceTextbox.FocusChanged += SelectBlindOption;
+            distanceTextbox.TextChanged += DistanceTextChanged;
+            distanceTextbox.EnterPressed += BlindJump;
+            gpsCombobox.FocusChanged += SelectGPSOption;
+            searchTextbox.TextChanged += FilterGpsList;
+            searchTextbox.FocusChanged += SearchFocusChanged;
         }
 
         public override void HandleUnhandledInput(bool receivedFocusInThisUpdate)
         {
-            base.HandleUnhandledInput(receivedFocusInThisUpdate);
-            if (this.charging.Count == 0)
+            HandleUnhandledInput(receivedFocusInThisUpdate);
+            if (charging.Count == 0)
             {
                 return;
             }
-            for (int i = this.charging.Count - 1; i >= 0; i--)
+            for (int i = charging.Count - 1; i >= 0; i--)
             {
-                this.RefreshButton(this.buttonlist[this.JumpDrives.IndexOf(this.charging[i])]);
-                if (this.charging[i].IsFull)
+                RefreshButton(buttonlist[JumpDrives.IndexOf(charging[i])]);
+                if (charging[i].IsFull)
                 {
-                    this.charging.RemoveAt(i);
+                    charging.RemoveAt(i);
                 }
             }
         }
 
         private void confirmButton_OnButtonClick(MyGuiControlButton sender)
         {
-            if (this.radioButtonGroup.SelectedButton.Key == 1)
+            if (radioButtonGroup.SelectedButton.Key == 1)
             {
-                this.BlindJump(this.distanceTextbox);
+                BlindJump(distanceTextbox);
             }
             else
             {
-                this.JumpToGPS();
+                JumpToGPS();
             }
-            this.CloseScreen(false);
+            CloseScreen(false);
         }
 
         private void cancelButton_OnButtonClick(MyGuiControlButton sender)
         {
-            this.JumpSystem.RequestAbort();
-            this.CloseScreen(false);
+            JumpSystem.RequestAbort();
+            CloseScreen(false);
         }
 
         public JumpSelectorGui(MyJumpDrive block) : base(new Vector2?(new Vector2(0.5f, 0.5f)), new Vector4?(MyGuiConstants.SCREEN_BACKGROUND_COLOR * MySandboxGame.Config.UIBkOpacity), new Vector2?(new Vector2(0.55f, 0.4f)), false, null, 0f, 0f, null)
         {
-            this.gpsList = new SortedList<string, IMyGps>();
-            base.CanHideOthers = false;
-            base.EnabledBackgroundFade = false;
-            base.CloseButtonEnabled = true;
+            gpsList = new SortedList<string, IMyGps>();
+            CanHideOthers = false;
+            EnabledBackgroundFade = false;
+            CloseButtonEnabled = true;
             JumpDrive = block;
             MyPlayer localHumanPlayer = MySession.Static.LocalHumanPlayer;
             if (localHumanPlayer != null && localHumanPlayer.Controller != null && localHumanPlayer.Controller.ControlledEntity != null && localHumanPlayer.Controller.ControlledEntity is MyShipController && JumpDrive != null)
             {
-                this.Controller = localHumanPlayer.Controller.ControlledEntity as MyShipController;
-                this.JumpSystem = block.CubeGrid.GridSystems.JumpSystem;
+                Controller = localHumanPlayer.Controller.ControlledEntity as MyShipController;
+                JumpSystem = block.CubeGrid.GridSystems.JumpSystem;
             }
             foreach (MyJumpDrive myJumpDrive in JumpDrive.CubeGrid.GetFatBlocks<MyJumpDrive>())
             {
-                this.JumpDrives.Add(myJumpDrive);
+                JumpDrives.Add(myJumpDrive);
                 if (!myJumpDrive.IsFull)
                 {
-                    this.charging.Add(myJumpDrive);
+                    charging.Add(myJumpDrive);
                 }
             }
-            this.RecreateControls(true);
+            RecreateControls(true);
         }
 
         public void GetGPSList()
@@ -194,20 +194,20 @@ namespace JumpSelector.Plugin
 
         private void JumpToGPS()
         {
-            if (this.gpsCombobox.GetItemsCount() == 0)
+            if (gpsCombobox.GetItemsCount() == 0)
             {
                 return;
             }
-            JumpSelectorGui.lastSelectedGps = (int)this.gpsCombobox.GetSelectedKey();
-            IMyGps myGps = this.gpsList.Values[JumpSelectorGui.lastSelectedGps];
-            this.JumpSystem.RequestJump(myGps.Name, myGps.Coords, MySession.Static.LocalPlayerId);
+            lastSelectedGps = (int)gpsCombobox.GetSelectedKey();
+            IMyGps myGps = gpsList.Values[lastSelectedGps];
+            JumpSystem.RequestJump(myGps.Name, myGps.Coords, MySession.Static.LocalPlayerId);
         }
 
         private void BlindJump(MyGuiControlTextbox obj)
         {
             StringBuilder stringBuilder = new StringBuilder();
-            this.distanceTextbox.GetText(stringBuilder);
-            JumpSelectorGui.lastDistance = stringBuilder.ToString();
+            distanceTextbox.GetText(stringBuilder);
+            lastDistance = stringBuilder.ToString();
             double num = 0.0;
             try
             {
@@ -215,43 +215,43 @@ namespace JumpSelector.Plugin
             }
             catch
             {
-                this.distanceTextbox.Clear();
+                distanceTextbox.Clear();
                 return;
             }
             if (num < 5000.01)
             {
                 num = 5000.01;
             }
-            Vector3D value = Vector3D.Transform(Base6Directions.GetVector(this.Controller.Orientation.Forward), this.Controller.CubeGrid.WorldMatrix.GetOrientation());
+            Vector3D value = Vector3D.Transform(Base6Directions.GetVector(Controller.Orientation.Forward), Controller.CubeGrid.WorldMatrix.GetOrientation());
             value.Normalize();
-            Vector3D destination = this.JumpDrive.CubeGrid.WorldMatrix.Translation + value * num;
-            this.JumpSystem.RequestJump("Blind Jump", destination, MySession.Static.LocalPlayerId);
+            Vector3D destination = JumpDrive.CubeGrid.WorldMatrix.Translation + value * num;
+            JumpSystem.RequestJump("Blind Jump", destination, MySession.Static.LocalPlayerId);
         }
 
         private void ToggleJDPower(MyGuiControlButton obj)
         {
-            this.JumpDrives[obj.Index].Enabled = !this.JumpDrives[obj.Index].Enabled;
-            this.RefreshButton(obj);
+            JumpDrives[obj.Index].Enabled = !JumpDrives[obj.Index].Enabled;
+            RefreshButton(obj);
         }
 
         private void ToggleAllJDPower(MyGuiControlButton obj)
         {
-            foreach (var drive in this.JumpDrives)
+            foreach (var drive in JumpDrives)
             {
                 if  (drive != null)
                     drive.Enabled = true;
             }
-            this.RecreateControls(false);
+            RecreateControls(false);
         }
 
         private void RefreshButton(MyGuiControlButton obj)
         {
-            if (this.JumpDrives[obj.Index] != null && !this.JumpDrives[obj.Index].SlimBlock.IsDestroyed)
+            if (JumpDrives[obj.Index] != null && !JumpDrives[obj.Index].SlimBlock.IsDestroyed)
             {
-                MyTuple<string, Color> tooltip = this.GetTooltip(this.JumpDrives[obj.Index]);
+                MyTuple<string, Color> tooltip = GetTooltip(JumpDrives[obj.Index]);
                 obj.BorderColor = tooltip.Item2;
                 obj.SetToolTip(tooltip.Item1);
-                this.rangelabel.Text = string.Format("Max Range: {0:N0}km", this.JumpSystem.GetMaxJumpDistance(MySession.Static.LocalPlayerId) / 1000.0);
+                rangelabel.Text = string.Format("Max Range: {0:N0}km", JumpSystem.GetMaxJumpDistance(MySession.Static.LocalPlayerId) / 1000.0);
                 return;
             }
             obj.BorderColor = Color.Gray;
@@ -262,8 +262,8 @@ namespace JumpSelector.Plugin
         {
             if (focus)
             {
-                this.distanceTextbox.SelectAll();
-                this.radioButtonGroup.SelectByKey(1);
+                distanceTextbox.SelectAll();
+                radioButtonGroup.SelectByKey(1);
             }
         }
 
@@ -271,8 +271,8 @@ namespace JumpSelector.Plugin
         {
             if (focus)
             {
-                this.gpsCombobox.IsActiveControl = true;
-                this.radioButtonGroup.SelectByKey(0);
+                gpsCombobox.IsActiveControl = true;
+                radioButtonGroup.SelectByKey(0);
             }
         }
 
@@ -302,47 +302,42 @@ namespace JumpSelector.Plugin
 
         private void FilterGpsList(MyGuiControlTextbox obj)
         {
-            this.radioButtonGroup.SelectByKey(0);
+            radioButtonGroup.SelectByKey(0);
             StringBuilder stringBuilder = new StringBuilder();
             obj.GetText(stringBuilder);
-            string text = stringBuilder.ToString();
-            SortedList<string, IMyGps> sortedList = new SortedList<string, IMyGps>();
-            string[] array = text.ToLower().Split(new char[]{' '});
-            if (text != null)
+            string filterText = stringBuilder.ToString();
+            SortedList<string, IMyGps> filteredList = new SortedList<string, IMyGps>();
+            string[] array = filterText.ToLower().Split(new char[] { ' ' });
+            if (filterText != null)
             {
-                using (IEnumerator<KeyValuePair<string, IMyGps>> enumerator = this.gpsList.GetEnumerator())
+                foreach (var keyValuePair in gpsList)
                 {
-                    while (enumerator.MoveNext())
+                    string text2 = keyValuePair.Value.Name.ToString().ToLower();
+                    bool flag = true;
+                    foreach (string text3 in array)
                     {
-                        KeyValuePair<string, IMyGps> keyValuePair = enumerator.Current;
-                        string text2 = keyValuePair.Value.Name.ToString().ToLower();
-                        bool flag = true;
-                        foreach (string text3 in array)
+                        if (!text2.Contains(text3.ToLower()))
                         {
-                            if (!text2.Contains(text3.ToLower()))
-                            {
-                                flag = false;
-                                break;
-                            }
-                        }
-                        if (flag)
-                        {
-                            sortedList.Add(keyValuePair.Key, keyValuePair.Value);
+                            flag = false;
+                            break;
                         }
                     }
-                    goto IL_DE;
+                    if (flag)
+                    {
+                        filteredList.Add(keyValuePair.Key, keyValuePair.Value);
+                    }
                 }
             }
-            sortedList = this.gpsList;
-        IL_DE:
-            this.gpsCombobox.ClearItems();
-            foreach (KeyValuePair<string, IMyGps> keyValuePair2 in sortedList)
+            else
+                filteredList = gpsList;
+            gpsCombobox.ClearItems();
+            foreach (KeyValuePair<string, IMyGps> keyValuePair2 in filteredList)
             {
-                this.gpsCombobox.AddItem((long)this.gpsList.IndexOfKey(keyValuePair2.Key), keyValuePair2.Key, null, null, true);
+                gpsCombobox.AddItem((long)gpsList.IndexOfKey(keyValuePair2.Key), keyValuePair2.Key, null, null, true);
             }
-            if (this.gpsCombobox.GetItemsCount() > 0)
+            if (gpsCombobox.GetItemsCount() > 0)
             {
-                this.gpsCombobox.SelectItemByIndex(0);
+                gpsCombobox.SelectItemByIndex(0);
             }
         }
 
@@ -350,14 +345,14 @@ namespace JumpSelector.Plugin
         {
             if (focus)
             {
-                this.searchTextbox.SelectAll();
-                this.radioButtonGroup.SelectByKey(0);
+                searchTextbox.SelectAll();
+                radioButtonGroup.SelectByKey(0);
             }
         }
 
         private void DistanceTextChanged(MyGuiControlTextbox obj)
         {
-            this.radioButtonGroup.SelectByKey(1);
+            radioButtonGroup.SelectByKey(1);
         }
 
         private MyGuiControlButton cancelButton;
