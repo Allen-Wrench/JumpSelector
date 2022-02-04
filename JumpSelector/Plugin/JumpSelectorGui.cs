@@ -17,14 +17,38 @@ namespace JumpSelector.Plugin
 {
     public class JumpSelectorGui : MyGuiScreenBase
     {
+        public JumpSelectorGui(MyJumpDrive block) : base(new Vector2?(new Vector2(0.5f, 0.5f)), new Vector4?(MyGuiConstants.SCREEN_BACKGROUND_COLOR * MySandboxGame.Config.UIBkOpacity), new Vector2?(new Vector2(0.55f, 0.4f)), false, null, 0f, 0f, null)
+        {
+            gpsList = new SortedList<string, IMyGps>();
+            CanHideOthers = false;
+            EnabledBackgroundFade = false;
+            CloseButtonEnabled = true;
+            JumpDrive = block;
+            MyPlayer localHumanPlayer = MySession.Static.LocalHumanPlayer;
+            if (localHumanPlayer != null && localHumanPlayer.Controller != null && localHumanPlayer.Controller.ControlledEntity != null && localHumanPlayer.Controller.ControlledEntity is MyShipController && JumpDrive != null)
+            {
+                Controller = localHumanPlayer.Controller.ControlledEntity as MyShipController;
+                JumpSystem = block.CubeGrid.GridSystems.JumpSystem;
+            }
+            foreach (MyJumpDrive myJumpDrive in JumpDrive.CubeGrid.GetFatBlocks<MyJumpDrive>())
+            {
+                JumpDrives.Add(myJumpDrive);
+                if (!myJumpDrive.IsFull)
+                {
+                    charging.Add(myJumpDrive);
+                }
+            }
+            RecreateControls(true);
+        }
+
         public override string GetFriendlyName()
         {
             return "JumpSelector";
         }
 
-        public override void RecreateControls(bool contructor)
+        public override void RecreateControls(bool constructor)
         {
-            RecreateControls(contructor);
+            base.RecreateControls(constructor);
             Vector2 value = listpos;
             float num = listoffset;
             Vector2 vector = listsize;
@@ -115,7 +139,7 @@ namespace JumpSelector.Plugin
 
         public override void HandleUnhandledInput(bool receivedFocusInThisUpdate)
         {
-            HandleUnhandledInput(receivedFocusInThisUpdate);
+            base.HandleUnhandledInput(receivedFocusInThisUpdate);
             if (charging.Count == 0)
             {
                 return;
@@ -147,30 +171,6 @@ namespace JumpSelector.Plugin
         {
             JumpSystem.RequestAbort();
             CloseScreen(false);
-        }
-
-        public JumpSelectorGui(MyJumpDrive block) : base(new Vector2?(new Vector2(0.5f, 0.5f)), new Vector4?(MyGuiConstants.SCREEN_BACKGROUND_COLOR * MySandboxGame.Config.UIBkOpacity), new Vector2?(new Vector2(0.55f, 0.4f)), false, null, 0f, 0f, null)
-        {
-            gpsList = new SortedList<string, IMyGps>();
-            CanHideOthers = false;
-            EnabledBackgroundFade = false;
-            CloseButtonEnabled = true;
-            JumpDrive = block;
-            MyPlayer localHumanPlayer = MySession.Static.LocalHumanPlayer;
-            if (localHumanPlayer != null && localHumanPlayer.Controller != null && localHumanPlayer.Controller.ControlledEntity != null && localHumanPlayer.Controller.ControlledEntity is MyShipController && JumpDrive != null)
-            {
-                Controller = localHumanPlayer.Controller.ControlledEntity as MyShipController;
-                JumpSystem = block.CubeGrid.GridSystems.JumpSystem;
-            }
-            foreach (MyJumpDrive myJumpDrive in JumpDrive.CubeGrid.GetFatBlocks<MyJumpDrive>())
-            {
-                JumpDrives.Add(myJumpDrive);
-                if (!myJumpDrive.IsFull)
-                {
-                    charging.Add(myJumpDrive);
-                }
-            }
-            RecreateControls(true);
         }
 
         public void GetGPSList()
