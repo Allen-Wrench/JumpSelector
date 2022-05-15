@@ -62,5 +62,26 @@ namespace JumpSelector.Plugin
             yield return new CodeInstruction(OpCodes.Ret, null);
             yield break;
         }
+
+        public static bool JumpEffectPatch()
+        {
+            return false;
+        }
+
+        public static IEnumerable<CodeInstruction> PerformJumpTranspiler(IEnumerable<CodeInstruction> instructions)
+        {
+            List<CodeInstruction> code = instructions.ToList();
+            for (int i = 0; i < code.Count(); i++)
+            {
+                if (code[i].Calls(AccessTools.Method("Sandbox.Game.GameSystems.MyGridJumpDriveSystem:IsLocalCharacterAffectedByJump")))
+                {
+                    code[i-1] = new CodeInstruction(OpCodes.Pop, null);
+                    code[i] = new CodeInstruction(OpCodes.Ldc_I4_0, null);
+                    break;
+                }
+            }
+
+            return code;
+        }
     }
 }

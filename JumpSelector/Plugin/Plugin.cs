@@ -13,15 +13,15 @@ namespace JumpSelector.Plugin
 
 		public void Init(object gameInstance)
         {
-            new Harmony("JumpSelector").Patch(AccessTools.Method("Sandbox.Game.Entities.MyJumpDrive:CreateTerminalControls", null, null), null, null, new HarmonyMethod(AccessTools.Method("JumpSelector.Plugin.JumpSelectorPatch:JumpSelectTranspiler", null, null)), null);
-            MySandboxGame.Log.WriteLine("Jump Selector Plugin Loaded.");
+			Harmony harmony = new Harmony("JumpSelector");
+			harmony.Patch(AccessTools.Method("Sandbox.Game.Entities.MyJumpDrive:CreateTerminalControls", null, null), null, null, new HarmonyMethod(AccessTools.Method("JumpSelector.Plugin.JumpSelectorPatch:JumpSelectTranspiler", null, null)), null);
+			harmony.Patch(AccessTools.Method("Sandbox.Game.GameSystems.MyGridJumpDriveSystem:UpdateJumpEffect", null, null), new HarmonyMethod(AccessTools.Method("JumpSelector.Plugin.JumpSelectorPatch:JumpEffectPatch", null, null)), null, null, null);
+			harmony.Patch(AccessTools.Method("Sandbox.Game.GameSystems.MyGridJumpDriveSystem:PerformJump", null, null), null, null, new HarmonyMethod(AccessTools.Method("JumpSelector.Plugin.JumpSelectorPatch:PerformJumpTranspiler", null, null)), null);
+			harmony.Patch(AccessTools.Method("Sandbox.Game.GameSystems.MyGridJumpDriveSystem:CleanupAfterJump", null, null), null, null, new HarmonyMethod(AccessTools.Method("JumpSelector.Plugin.JumpSelectorPatch:PerformJumpTranspiler", null, null)), null);
+			MySandboxGame.Log.WriteLine("Jump Selector Plugin Loaded.");
 		}
 
 		public void Update()
-		{
-		}
-
-		public Plugin()
 		{
 		}
 	}

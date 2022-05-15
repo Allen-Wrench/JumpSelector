@@ -164,7 +164,6 @@ namespace JumpSelector.Plugin
             {
                 JumpToGPS();
             }
-            CloseScreen(false);
         }
 
         private void cancelButton_OnButtonClick(MyGuiControlButton sender)
@@ -200,6 +199,7 @@ namespace JumpSelector.Plugin
             }
             lastSelectedGps = (int)gpsCombobox.GetSelectedKey();
             IMyGps myGps = gpsList.Values[lastSelectedGps];
+            CloseScreen(false);
             JumpSystem.RequestJump(myGps.Name, myGps.Coords, MySession.Static.LocalPlayerId);
         }
 
@@ -225,6 +225,7 @@ namespace JumpSelector.Plugin
             Vector3D value = Vector3D.Transform(Base6Directions.GetVector(Controller.Orientation.Forward), Controller.CubeGrid.WorldMatrix.GetOrientation());
             value.Normalize();
             Vector3D destination = JumpDrive.CubeGrid.WorldMatrix.Translation + value * num;
+            CloseScreen(false);
             JumpSystem.RequestJump("Blind Jump", destination, MySession.Static.LocalPlayerId);
         }
 
