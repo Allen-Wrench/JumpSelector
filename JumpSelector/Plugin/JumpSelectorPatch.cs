@@ -7,10 +7,8 @@ using HarmonyLib;
 using Sandbox.Game.Entities;
 using Sandbox.Game.Gui;
 using Sandbox.Game.Screens.Terminal.Controls;
-using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
 using VRage.Game;
-using VRageMath;
 
 namespace JumpSelector.Plugin
 {

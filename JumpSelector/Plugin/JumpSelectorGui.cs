@@ -6,6 +6,7 @@ using Sandbox.Game.Entities;
 using Sandbox.Game.GameSystems;
 using Sandbox.Game.World;
 using Sandbox.Graphics.GUI;
+using SpaceEngineers.Game.ModAPI;
 using VRage;
 using VRage.Audio;
 using VRage.Game;
@@ -25,9 +26,8 @@ namespace JumpSelector.Plugin
             CloseButtonEnabled = true;
             JumpDrive = block;
             MyPlayer localHumanPlayer = MySession.Static.LocalHumanPlayer;
-            if (localHumanPlayer != null && localHumanPlayer.Controller != null && localHumanPlayer.Controller.ControlledEntity != null && localHumanPlayer.Controller.ControlledEntity is MyShipController && JumpDrive != null)
+            if (localHumanPlayer != null && localHumanPlayer.Controller != null && localHumanPlayer.Controller.ControlledEntity != null && JumpDrive != null)
             {
-                Controller = localHumanPlayer.Controller.ControlledEntity as MyShipController;
                 JumpSystem = block.CubeGrid.GridSystems.JumpSystem;
             }
             foreach (MyJumpDrive myJumpDrive in JumpDrive.CubeGrid.GetFatBlocks<MyJumpDrive>())
@@ -222,9 +222,15 @@ namespace JumpSelector.Plugin
             {
                 num = 5000.01;
             }
-            Vector3D value = Vector3D.Transform(Base6Directions.GetVector(Controller.Orientation.Forward), Controller.CubeGrid.WorldMatrix.GetOrientation());
-            value.Normalize();
-            Vector3D destination = JumpDrive.CubeGrid.WorldMatrix.Translation + value * num;
+			MyPlayer Player = MySession.Static.LocalHumanPlayer;
+			Vector3D value;
+			if (Player.Controller.ControlledEntity is MyShipController)
+				value = Vector3D.Transform(Base6Directions.GetVector((Player.Controller.ControlledEntity as MyShipController).Orientation.Forward), JumpDrive.CubeGrid.WorldMatrix.GetOrientation());
+			else if (Player.Controller.ControlledEntity is IMyTurretControlBlock)
+				value = (Player.Controller.ControlledEntity as IMyTurretControlBlock).GetShootDirection();
+			else
+				value = Player.Controller.ControlledEntity.GetHeadMatrix(true).GetDirectionVector(Base6Directions.Direction.Forward);
+			Vector3D destination = JumpDrive.CubeGrid.WorldMatrix.Translation + value * num;
             CloseScreen(false);
             JumpSystem.RequestJump("Blind Jump", destination, MySession.Static.LocalPlayerId);
         }
@@ -411,8 +417,6 @@ namespace JumpSelector.Plugin
         private MyGridJumpDriveSystem JumpSystem;
 
         private MyJumpDrive JumpDrive;
-
-        private MyShipController Controller;
 
         private List<MyJumpDrive> JumpDrives = new List<MyJumpDrive>();
 
