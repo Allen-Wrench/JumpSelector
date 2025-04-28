@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Sandbox;
 using Sandbox.Game.Entities;
@@ -18,6 +19,9 @@ namespace JumpSelector.Plugin
 {
     public class JumpSelectorGui : MyGuiScreenBase
     {
+        private static PropertyInfo IsFull = typeof(MyJumpDrive).GetProperty("IsFull", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static PropertyInfo CurrentStoredPower = typeof(MyJumpDrive).GetProperty("CurrentStoredPower", BindingFlags.NonPublic | BindingFlags.Instance);
+
         public JumpSelectorGui(MyJumpDrive block) : base(new Vector2?(new Vector2(0.5f, 0.5f)), new Vector4?(MyGuiConstants.SCREEN_BACKGROUND_COLOR * MySandboxGame.Config.UIBkOpacity), new Vector2?(new Vector2(0.55f, 0.4f)), false, null, 0f, 0f, null)
         {
             gpsList = new SortedList<string, IMyGps>();
@@ -33,7 +37,8 @@ namespace JumpSelector.Plugin
             foreach (MyJumpDrive myJumpDrive in JumpDrive.CubeGrid.GetFatBlocks<MyJumpDrive>())
             {
                 JumpDrives.Add(myJumpDrive);
-                if (!myJumpDrive.IsFull)
+                var isfull = (bool)IsFull.GetValue(myJumpDrive);
+                if (!isfull)
                 {
                     charging.Add(myJumpDrive);
                 }
@@ -147,7 +152,8 @@ namespace JumpSelector.Plugin
             for (int i = charging.Count - 1; i >= 0; i--)
             {
                 RefreshButton(buttonlist[JumpDrives.IndexOf(charging[i])]);
-                if (charging[i].IsFull)
+                var isfull = (bool)IsFull.GetValue(charging[i]);
+                if (isfull)
                 {
                     charging.RemoveAt(i);
                 }
@@ -287,9 +293,11 @@ namespace JumpSelector.Plugin
         {
             string text = "[On] ";
             Color item = Color.Green;
-            if (!jd.IsFull)
+            var isfull = (bool)IsFull.GetValue(jd);
+            if (!isfull)
             {
-                float num = jd.CurrentStoredPower / jd.BlockDefinition.PowerNeededForJump * 100f;
+                var currentpower = (float)CurrentStoredPower.GetValue(jd);
+                float num =  currentpower / jd.BlockDefinition.PowerNeededForJump * 100f;
                 text = string.Format("[Charging {0:N1}%] ", num);
                 item = Color.Yellow;
             }
