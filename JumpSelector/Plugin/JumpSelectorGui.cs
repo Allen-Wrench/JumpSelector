@@ -33,7 +33,7 @@ namespace JumpSelector.Plugin
             foreach (MyJumpDrive myJumpDrive in JumpDrive.CubeGrid.GetFatBlocks<MyJumpDrive>())
             {
                 JumpDrives.Add(myJumpDrive);
-                if (!myJumpDrive.IsFull)
+                if (myJumpDrive.StoredPowerRatio < 1.0)
                 {
                     charging.Add(myJumpDrive);
                 }
@@ -147,7 +147,7 @@ namespace JumpSelector.Plugin
             for (int i = charging.Count - 1; i >= 0; i--)
             {
                 RefreshButton(buttonlist[JumpDrives.IndexOf(charging[i])]);
-                if (charging[i].IsFull)
+                if (charging[i].StoredPowerRatio == 1.0)
                 {
                     charging.RemoveAt(i);
                 }
@@ -287,9 +287,9 @@ namespace JumpSelector.Plugin
         {
             string text = "[On] ";
             Color item = Color.Green;
-            if (!jd.IsFull)
+            if (jd.StoredPowerRatio < 1.0)
             {
-                float num = jd.CurrentStoredPower / jd.BlockDefinition.PowerNeededForJump * 100f;
+                float num = jd.StoredPowerRatio * 100f;
                 text = string.Format("[Charging {0:N1}%] ", num);
                 item = Color.Yellow;
             }
