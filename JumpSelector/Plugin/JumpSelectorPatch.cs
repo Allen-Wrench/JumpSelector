@@ -38,7 +38,7 @@ namespace JumpSelector.Plugin
 
         public static void ShowJumpSelector(MyJumpDrive block)
         {
-            if (block.IDModule.ShareMode == MyOwnershipShareModeEnum.All || (block.GetPlayerRelationToOwner() == MyRelationsBetweenPlayerAndBlock.Owner || block.GetPlayerRelationToOwner() == MyRelationsBetweenPlayerAndBlock.FactionShare))
+            if (block.GetPlayerRelationToOwner().IsFriendly())
             {
                 MyGuiSandbox.AddScreen(new JumpSelectorGui(block));
             }
